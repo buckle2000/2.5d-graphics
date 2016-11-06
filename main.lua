@@ -3,7 +3,7 @@ canvas:setFilter('nearest','nearest')
 love.graphics.setDefaultFilter('nearest', 'nearest')
 local img_chair = love.graphics.newImage("chair.png")
 local sw, sh = img_chair:getDimensions()
--- local batch = love.graphics.newSpriteBatch(img_chair)
+local batch = love.graphics.newSpriteBatch(img_chair, 100000)
 local quads = {}
 local angle = 0.0
 SCALE = 0.5
@@ -16,10 +16,10 @@ end
 
 function love.update(dt)
 	if love.keyboard.isDown('left') then
-		angle = angle - 0.03
+		angle = angle - 0.01
 	end
 	if love.keyboard.isDown('right') then
-		angle = angle + 0.03
+		angle = angle + 0.01
 	end
 end
 
@@ -43,29 +43,27 @@ end
 round = function (n) return n end
 
 local function draw()
+	love.graphics.print("press 'left' or 'right'")
 	table.sort(objs, function (a,b) return a[2]<b[2] end)
+	batch:clear()
 	for _,obj in ipairs(objs) do
 		for i=1,64 do
-			love.graphics.draw(img_chair, quads[i], round(obj[1]), round(obj[2])+(1-i)/SCALE, angle, nil, nil, 16, 16)
+				batch:add(quads[i], round(obj[1]), round(obj[2])+(1-i)/SCALE, angle, nil, nil, 16, 16)
 		end
 	end
-end
-
-function love.draw()
-	-- love.graphics.setCanvas(canvas)
-	-- love.graphics.clear()
-	-- love.graphics.push()
+	batch:flush()
 	love.graphics.setShader(shader)
 	love.graphics.translate(400, 300)
 	love.graphics.scale(1, SCALE)
+	love.graphics.draw(batch)
+end
+
+function love.draw()
 	clear()
-	for row=-1,1 do
-		for col=-1,1 do
-			draw_chair(row*40, col*40)
+	for row=-5,5 do
+		for col=-5,5 do
+			draw_chair(row*50, col*50)
 		end
 	end
 	draw()
-	-- love.graphics.pop()
-	-- love.graphics.setCanvas()
-	-- love.graphics.draw(canvas)
 end
